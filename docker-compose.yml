@@ -1,0 +1,39 @@
+version: '3.5'
+
+services:
+
+  web:
+    build: ./local/web
+    container_name: web
+    volumes:
+      - .:/var/www/html
+    ports:
+      - 80:80
+    environment:
+      - APACHE_RUN_USER=#1000
+      - APACHE_RUN_GROUP=#1000
+      - DOCUMENT_ROOT=/var/www/html/public
+    depends_on:
+      - db
+
+  db:
+    image: mysql
+    container_name: db
+    volumes:
+      - ./local/db/data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+    command: --default-authentication-plugin=mysql_native_password
+
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - 8080:80
+    depends_on:
+      - web
+      - db
